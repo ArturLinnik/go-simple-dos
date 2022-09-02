@@ -27,33 +27,43 @@ func main() {
 	}
 	fmt.Println("") // Blank line
 
-	wg := sync.WaitGroup{} // Sync go routines
+	// Create request structure
+	client := &http.Client{}
 
-	var success int
-	var fail int
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	start := time.Now() // Start timer
+
+	wg := sync.WaitGroup{} // Sync go routines
+
+	// Send requests
+	var success int
+	var fail int
 
 	for i := 0; i < numReq; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			resp, err := http.Get(url)
+			resp, err := client.Do(req)
 			if err != nil {
 				log.Println(err)
 			}
 			fmt.Println(resp.Request.URL, "---", resp.Status)
-			if resp.StatusCode == 200 {
-				success += 1
-			} else {
+			if resp.StatusCode != http.StatusOK {
 				fail += 1
+			} else {
+				success += 1
 			}
 		}()
 	}
 	wg.Wait()
 
-	finish := time.Since(start)
+	finish := time.Since(start) // Stop timer
 
+	// Print results
 	fmt.Println("\nSUCCESSFUL:", success, " --- ", "FAILED:", fail)
 	fmt.Println("TIME:", finish)
 }
