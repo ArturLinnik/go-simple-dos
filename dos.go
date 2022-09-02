@@ -11,22 +11,28 @@ import (
 func main() {
 
 	// Ask for the URL of the webpage
-	fmt.Print("URL: ")
 	var url string
-	fmt.Scanln(&url)
+	fmt.Print("URL: ")
+	_, err := fmt.Scanln(&url)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Ask for the number of requests
-	fmt.Print("Number of requests: ")
 	var numReq int
-	fmt.Scanln(&numReq)
+	fmt.Print("Number of requests: ")
+	_, err = fmt.Scanln(&numReq)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println("") // Blank line
 
-	wg := sync.WaitGroup{}
+	wg := sync.WaitGroup{} // Sync go routines
 
 	var success int
 	var fail int
 
-	start := time.Now()
+	start := time.Now() // Start timer
 
 	for i := 0; i < numReq; i++ {
 		wg.Add(1)
